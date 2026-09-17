@@ -7,23 +7,19 @@
     <style>
         body { font-family: Arial, sans-serif; background: #0b0b0b; color: #e0e0e0; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .game-window { width: 100%; max-width: 450px; background: #141414; border: 2px solid #3a1c5c; border-radius: 12px; padding: 15px; box-sizing: border-box; }
-        .screen { width: 100%; aspect-ratio: 1/1; position: relative; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid #3a1c5c; }
-        .loc-img { width: 100%; height: 100%; object-fit: cover; }
-        .loc-text { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.85); padding: 10px; font-size: 13px; text-align: center; border-top: 1px solid #3a1c5c; }
+        .screen { width: 100%; height: 80px; background: #221435; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #3a1c5c; }
+        .loc-text { padding: 10px; font-size: 14px; text-align: center; font-weight: bold; color: #d6bbf2; }
         .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; background: #1c1c1c; padding: 10px; border-radius: 6px; font-size: 13px; }
         .bar { background: #2b2b2b; height: 10px; border-radius: 4px; overflow: hidden; margin-top: 4px; }
         .fill { height: 100%; transition: width 0.3s; }
         .btn { background: #3a1c5c; color: #fff; border: 1px solid #5c2d91; padding: 12px; margin: 6px 0; border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; box-sizing: border-box; }
-        .btn-move { background: #1c2d5a; border-color: #294488; }
+        .btn-move { background: #1c2d5a; border-color: #294488; padding: 10px; font-size: 13px; }
         .log { background: #080808; border: 1px solid #222; height: 110px; overflow-y: auto; padding: 8px; border-radius: 6px; font-size: 12px; margin-top: 10px; color: #a0a0a0; }
     </style>
 </head>
 <body>
 <div class="game-window">
-    <div class="screen">
-        <img id="locImg" class="loc-img" src="https://githubusercontent.com">
-        <div id="locDesc" class="loc-text">Загрузка подземного мира...</div>
-    </div>
+    <div class="screen"><div id="locDesc" class="loc-text">Загрузка...</div></div>
     <div class="stats">
         <div>❤️ Здоровье: <span id="txtHp">100</span>/100<div class="bar"><div id="barHp" class="fill" style="background:#cf1414; width:100%;"></div></div></div>
         <div>🍖 Сытость: <span id="txtHunger">100</span>/100<div class="bar"><div id="barHunger" class="fill" style="background:#f1c40f; width:100%;"></div></div></div>
@@ -41,28 +37,23 @@
 <script>
     const locations = {
         "Полянка на Нейтралках": {
-            img: "https://githubusercontent.com",
-            desc: "Вечный мрак. Трава светится ядовито-зеленым. Кружат фиолетовые светлячки. Луна была убита здесь собакой... Опасно!",
+            desc: "🐾 Полянка на Нейтралках. Вечный мрак. Вокруг кружат фиолетовые светлячки. Луна была убита здесь собакой... Опасно!",
             exits: ["Гигантское Дупло", "Старое Гнездо Двуногих", "Подземный Коллектор"]
         },
         "Гигантское Дупло": {
-            img: "https://githubusercontent.com",
-            desc: "Лагерь Племени Теплого Света. Огромное дупло древнего дерева. Коты греются в коконах из фиолетовых светлячков. Здесь рождаются крылатые котята.",
+            desc: "🌳 Лагерь Племени Теплого Света. Огромное дупло древнего дерева. Здесь тепло и рождаются крылатые котята.",
             exits: ["Полянка на Нейтралках"]
         },
         "Старое Гнездо Двуногих": {
-            img: "https://githubusercontent.com",
-            desc: "Лагерь Племени Пылающего Огня. Разрушенный дом Двуногих, где воители греются углищами. Во дворе лежат ледяные цветы, рассыпающиеся при касании.",
+            desc: "🔥 Лагерь Племени Пылающего Огня. Разрушенный дом Двуногих. Во дворе лежат хрупкие ледяные цветы.",
             exits: ["Полянка на Нейтралках"]
         },
         "Подземный Коллектор": {
-            img: "https://githubusercontent.com",
-            desc: "Лагерь Глубинного Племени. Заброшенный каменный коллектор Двуногих под землей. Здесь нет ветра, все коты белые, слепые, но обладают безупречным слухом.",
+            desc: "🕳️ Лагерь Глубинного Племени. Заброшенный каменный коллектор под землей. Все коты здесь белые и слепые.",
             exits: ["Полянка на Нейтралках", "Лабиринт темных нор"]
         },
         "Лабиринт темных нор": {
-            img: "https://githubusercontent.com",
-            desc: "Опасные подземные туннели вне лагеря Глубинного племени. Здесь абсолютная тьма, но благодаря длинным усам тут самая легкая стопроцентная охота!",
+            desc: "🚇 Опасные подземные туннели. Здесь абсолютная тьма, но охота всегда успешна на 100% благодаря усам!",
             exits: ["Подземный Коллектор"]
         }
     };
@@ -76,12 +67,10 @@
     function saveGame() { localStorage.setItem('github_cat_save', JSON.stringify(cat)); }
     function log(msg) {
         let box = document.getElementById('gameLog');
-        box.innerHTML += `<div>• ${msg}</div>`;
-        box.scrollTop = box.scrollHeight;
+        if(box) { box.innerHTML += `<div>• ${msg}</div>`; box.scrollTop = box.scrollHeight; }
     }
     function updateUI() {
         let loc = locations[cat.location];
-        document.getElementById('locImg').src = loc.img;
         document.getElementById('locDesc').innerText = loc.desc;
         document.getElementById('txtHp').innerText = cat.hp;
         document.getElementById('barHp').style.width = cat.hp + "%";
@@ -111,16 +100,11 @@
     function moveTo(target) {
         if (cat.mutation === 3) { log("Вы безумны и бегаете кругами во тьме!"); return; }
         if (cat.hunger < 5) { log("Вы слишком ослабли от голода для перехода."); return; }
-        cat.location = target;
-        cat.hunger = Math.max(0, cat.hunger - 5);
+        cat.location = target; cat.hunger = Math.max(0, cat.hunger - 5);
         log(`Вы перешли в: ${target}. Потрачено 5 сытости.`);
         if (target === "Полянка на Нейтралках" && Math.random() < 0.25) {
-            cat.hp = Math.max(0, cat.hp - 30);
-            log(`🚨 НАПАЛА МУТИРОВАВШАЯ СОБАКА! Укус в плечо! Потеряно 30 HP.`);
-            if (Math.random() < 0.4 && cat.mutation === 0) {
-                cat.mutation = 1;
-                log("🦠 В рану попала Скверна. Начался Черный Кашель...");
-            }
+            cat.hp = Math.max(0, cat.hp - 30); log(`🚨 НАПАЛА МУТИРОВАВШАЯ СОБАКА! Потеряно 30 HP.`);
+            if (Math.random() < 0.4 && cat.mutation === 0) { cat.mutation = 1; log("🦠 Начался Черный Кашель..."); }
         }
         saveGame(); updateUI();
     }
@@ -132,28 +116,31 @@
             let chance = (cat.location === "Лабиринт темных нор" || cat.mutation === 2) ? 1.0 : 0.5;
             if (Math.random() < chance) {
                 cat.mice++; log("🦅 Вы поймали подземную мышь!");
-                if (Math.random() < 0.25 && cat.mutation === 0) {
-                    cat.mutation = 1; log("🦠 Мышь питалась светящейся травой! У вас начался Черный Кашель.");
-                }
+                if (Math.random() < 0.25 && cat.mutation === 0) { cat.mutation = 1; log("🦠 Вы подхватили Черный Кашель."); }
             } else { log("💨 Мышь юркнула под корень дерева во тьме."); }
         }
         if (type === 'eat') {
             if (cat.mice <= 0) { log("Нет мышей в лапах."); return; }
-            cat.mice--; cat.hunger = Math.min(100, cat.hunger + 30);
-            log("🍖 Вы съели сочную мышь. Сытость восстановлена.");
+            cat.mice--; cat.hunger = Math.min(100, cat.hunger + 30); log("🍖 Вы съели сочную мышь.");
         }
         if (type === 'search_coals') {
             cat.hunger = Math.max(0, cat.hunger - 3);
-            if (Math.random() < 0.5) {
-                cat.coals++; log("🔥 Найдена теплая головешка в печи!");
-            } else { log("❌ В печи только холодная сажа."); }
+            if (Math.random() < 0.5) { cat.coals++; log("🔥 Найдена теплая головешка в печи!"); } else { log("❌ В печи только холодная сажа."); }
         }
         if (type === 'burn_wound') {
             if (cat.coals <= 0) return;
-            cat.coals--; cat.hp = Math.max(10, cat.hp - 20); cat.mutation = 0;
-            log("🩸 Вы прижгли заразу углями за один день! Разум чист, вы снова здоровы.");
+            cat.coals--; cat.hp = Math.max(10, cat.hp - 20); cat.mutation = 0; log("🩸 Вы прижгли заразу углями! Вы снова здоровы.");
         }
         saveGame(); updateUI();
     }
     setInterval(() => {
-        if (cat.hunger > 0) 
+        if (cat.hunger > 0) {
+            cat.hunger--;
+            if (cat.mutation === 1 && Math.random() < 0.05) { cat.mutation = 2; log("🧬 У вас выросли рога и открылось Ночное Зрение!"); }
+        } else { cat.hp = Math.max(0, cat.hp - 5); log("🚨 ВЫ УМИРАЕТЕ ОТ ГОЛОДА!"); }
+        saveGame(); updateUI();
+    }, 40000);
+    window.onload = loadGame;
+</script>
+</body>
+</html>
