@@ -33,8 +33,8 @@
     </div>
 
     <div id="actionArea">
-        <button class="btn" onclick="gameAction('hunt')">🐾 Поохотиться (-12 сытости)</button>
-        <button class="btn" onclick="gameAction('eat')">🍖 Съесть мышь (+25 сытости)</button>
+        <button class="btn" onclick="gameAction('hunt')">🐾 Поохотиться (-7 сытости)</button>
+        <button class="btn" onclick="gameAction('eat')">🍖 Съесть мышь (+30 сытости)</button>
         <div id="specialAction"></div>
     </div>
 
@@ -47,7 +47,7 @@
     const locations = {
         "Полянка на Нейтралках": {
             img: "https://githubusercontent.com",
-            desc: "Вечный мрак. Трава светится ядовито-зеленым. Вокруг кружат фиолетовые светлячки. Луна была убита здесь собакой в плечо и горло...",
+            desc: "Вечный мрак. Трава светится ядовито-зеленым. Вокруг кружат фиолетовые светлячки.",
             exits: ["Гигантское Дупло", "Старое Гнездо Двуногих"]
         },
         "Гигантское Дупло": {
@@ -68,7 +68,7 @@
         let save = localStorage.getItem('github_cat_save');
         if (save) cat = JSON.parse(save);
         updateUI();
-        log("Вы очнулись во вечной тьме. Прогресс сохранен.");
+        log("Вы очнулись в вечной тьме. Прогресс сохранен.");
     }
 
     function saveGame() { localStorage.setItem('github_cat_save', JSON.stringify(cat)); }
@@ -91,9 +91,9 @@
 
         let statusTag = document.getElementById('txtStatus');
         if (cat.mutation === 0) { statusTag.innerText = "Здоров"; statusTag.style.color = "#2ecc71"; }
-        if (cat.mutation === 1) { statusTag.innerText = "1 Стадия: Черный Кашель 🦠"; statusTag.style.color = "#f39c12"; }
-        if (cat.mutation === 2) { statusTag.innerText = "2 Стадия: Искажающий Дар 👁️ (Рога и Ночное зрение!)"; statusTag.style.color = "#9b59b6"; }
-        if (cat.mutation === 3) { statusTag.innerText = "3 Стадия: БЕЗУМИЕ 💀"; statusTag.style.color = "#e74c3c"; }
+        if (cat.mutation === 1) { statusTag.innerText = "1 Стадия: Черный Кашель "; statusTag.style.color = "#f39c12"; }
+        if (cat.mutation === 2) { statusTag.innerText = "2 Стадия: Искажающий Дар  (Рога и Ночное зрение!)"; statusTag.style.color = "#9b59b6"; }
+        if (cat.mutation === 3) { statusTag.innerText = "3 Стадия: БЕЗУМИЕ "; statusTag.style.color = "#e74c3c"; }
 
         let specArea = document.getElementById('specialAction');
         if (cat.location === "Старое Гнездо Двуногих") {
@@ -112,15 +112,15 @@
     function moveTo(target) {
         if (cat.mutation === 3) { log("Вы безумны и бегаете кругами!"); return; }
         cat.location = target;
-        cat.hunger = Math.max(0, cat.hunger - 10);
-        log(`Вы перешли в: ${target}. Потрачено 10 сытости.`);
+        cat.hunger = Math.max(0, cat.hunger - 5);
+        log(`Вы перешли в: ${target}. Потрачено 5 сытости.`);
         
         if (target === "Полянка на Нейтралках" && Math.random() < 0.3) {
-            cat.hp = Math.max(0, cat.hp - 30);
-            log(`🚨 НАПАЛА МУТИРОВАВШАЯ СОБАКА! Укус в плечо! Потеряно 30 HP.`);
-            if (Math.random() < 0.5 && cat.mutation === 0) {
+            cat.hp = Math.max(0, cat.hp - 35);
+            log(` НАПАЛА МУТИРОВАВШАЯ СОБАКА! Укус в плечо! Потеряно 35 HP.`);
+            if (Math.random() < 1 && cat.mutation === 0) {
                 cat.mutation = 1;
-                log("🦠 Рана загноилась. Начался Черный Кашель...");
+                log(" Рана загноилась. Начался Черный Кашель...");
             }
         }
         saveGame(); updateUI();
@@ -129,19 +129,19 @@
     function gameAction(type) {
         if (cat.mutation === 3) return;
         if (type === 'hunt') {
-            if (cat.hunger < 15) { log("Вы слишком голодны."); return; }
-            cat.hunger -= 12;
+            if (cat.hunger < 10) { log("Вы слишком голодны."); return; }
+            cat.hunger -= 7;
             let chance = cat.mutation === 2 ? 0.9 : 0.5;
             if (Math.random() < chance) {
-                cat.mice++; log("🦅 Вы поймали мышь!");
+                cat.mice++; log(" Вы поймали мышь!");
                 if (Math.random() < 0.3 && cat.mutation === 0) {
-                    cat.mutation = 1; log("🦠 Мышь была заражена Скверной! У вас начался кашель.");
+                    cat.mutation = 1; log(" Мышь была заражена! У вас начался кашель.");
                 }
             } else { log("💨 Мышь убежала под ледяной куст."); }
         }
         if (type === 'eat') {
             if (cat.mice <= 0) return;
-            cat.mice--; cat.hunger = Math.min(100, cat.hunger + 25);
+            cat.mice--; cat.hunger = Math.min(100, cat.hunger + 30);
             log("🍖 Вы съели мышь.");
         }
         saveGame(); updateUI();
@@ -151,9 +151,9 @@
         if (cat.hunger > 0) {
             cat.hunger--;
             if (cat.mutation === 1 && Math.random() < 0.05) {
-                cat.mutation = 2; log("🧬 Болезнь укоренилась! У вас выросли рога и открылось Ночное Зрение!");
+                cat.mutation = 2; log(" Болезнь укоренилась! У вас выросли рога и открылось Ночное Зрение!");
             }
-        } else { cat.hp = Math.max(0, cat.hp - 5); log("🚨 Вы умираете от голода!"); }
+        } else { cat.hp = Math.max(0, cat.hp - 20); log(" Вы умираете от голода!"); }
         saveGame(); updateUI();
     }, 10000);
 
