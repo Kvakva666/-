@@ -129,7 +129,7 @@
     function gameAction(type) {
         if (cat.mutation === 3) return;
         if (type === 'hunt') {
-            if (cat.hunger < 10) { log("Вы слишком голодны."); return; }
+            if (cat.hunger < 15) { log("Вы слишком голодны."); return; }
             cat.hunger -= 7;
             let chance = cat.mutation === 2 ? 0.9 : 0.5;
             if (Math.random() < chance) {
